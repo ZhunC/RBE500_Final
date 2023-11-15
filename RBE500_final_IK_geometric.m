@@ -9,9 +9,9 @@ clc
 % which is the current end effector frame expressed in the space frame
 % length in mm
 % a user-defined H0_5 for testing: 
-H0_5 = [[1, 0, 0, 300];...
+H0_5 = [[1, 0, 0, 0];...
     [0, 1, 0, 0];...
-    [0, 0, 1, 0];...
+    [0, 0, 1, 300];...
     [0, 0, 0, 1]];
 d1 = 36.076 + 60.25; % mm, length of link 0+link 1
 a2 = sqrt(128^2+24^2); % mm, length between J2 and J3
@@ -23,10 +23,10 @@ a4 = 133.4; % mm, length of the end effector
 % the same notation is used as much as possible with the original paper
 
 % theta 1
-t1 = atan2(-H0_5(1,3),H0_5(2,3)); % theta 1 solved
+t1 = atan2(-H0_5(1,4),H0_5(2,4)); % theta 1 solved
 
 % r axis transformation
-phi = atan2(-H0_5(3,1),-H0_5(3,2)); % theta 2+3+4, Eq. 16
+phi = atan2(-H0_5(3,2),-H0_5(3,1)); % theta 2+3+4, Eq. 16
 px = H0_5(1,4);
 py = H0_5(2,4);
 r3 = sqrt(px^2 + py^2); % Eq. 13, 14
