@@ -13,20 +13,22 @@ H0_5 = [[1, 0, 0, 0];...
     [0, 1, 0, 0];...
     [0, 0, 1, 300];...
     [0, 0, 0, 1]];
+
+%%
+H0_5 = H0_5_num;
+
+%% IK
+% the same notation is used as much as possible with the original paper
 d1 = 36.076 + 60.25; % mm, length of link 0+link 1
 a2 = sqrt(128^2+24^2); % mm, length between J2 and J3
 a3 = 124; % mm, length of link 3
 a4 = 133.4; % mm, length of the end effector 
 
-
-%% IK
-% the same notation is used as much as possible with the original paper
-
 % theta 1
-t1 = atan2(-H0_5(1,4),H0_5(2,4)); % theta 1 solved
+t1 = atan2(-H0_5(1,3),H0_5(2,3)); % theta 1 solved
 
 % r axis transformation
-phi = atan2(-H0_5(3,2),-H0_5(3,1)); % theta 2+3+4, Eq. 16
+phi = atan2(-H0_5(3,1),-H0_5(3,2)); % theta 2+3+4, Eq. 16
 px = H0_5(1,4);
 py = H0_5(2,4);
 r3 = sqrt(px^2 + py^2); % Eq. 13, 14
@@ -36,7 +38,7 @@ z3 = H0_5(3,4) - d1; % Eq. 15
 r2 = r3 - a4*cos(phi); % Eq. 17
 z2 = z3 - a4*sin(phi); % Eq. 18
 
-% theta 3 from  Eq. 20
+% theta 3 from Eq. 20
 t3_1 = acos((r2^2+z2^2-a2^2-a3^2) / (2*a2*a3)); % first pose solution of theta 3
 t3_2 = -acos((r2^2+z2^2-a2^2-a3^2) / (2*a2*a3)); % second pose solution of theta 3
 t3 = [t3_1, t3_2];
