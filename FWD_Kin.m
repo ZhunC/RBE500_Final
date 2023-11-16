@@ -1,3 +1,13 @@
+syms theta1 theta2 theta3 theta4
+
+% Link 0
+a0 = 0;
+alpha0 = 0;
+d0 = 36.076;
+t0 = 0;
+
+% Link 1
+a1 = 0;
 alpha1 = -pi/2;
 d1 = 60.25;
 t1 = theta1;
