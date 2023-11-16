@@ -28,7 +28,7 @@ t2 = sol(1); % theta 2 solved
 t3 = sol(2); % theta 3 solved
 t4 = t234-t2-t3; % theta 4 solved
 
-thetaList = [t1, t2, t3, t4]
+thetaList = [t1, t2+pi/2, t3-pi/2, t4]
 
 
 function t = assistive(x, H0_5, t1, t234)
