@@ -2,18 +2,24 @@ import rclpy
 from rclpy.node import Node
 
 from sensor_msgs.msg import JointState
+from std_msgs.msg import Float32MultiArray
 import math
 
 class ForwardKinematicsOMX(Node):
 
     def __init__(self):
         super().__init__('forward_kinematics_omx')
+        self.publisher = self.create_publisher(
+            Float32MultiArray, 
+            'position_fksub', 
+            10)
         self.subscription = self.create_subscription(
             JointState,
             'joint_states',
             self.fk_callback,
             10)
         self.subscription 
+        self.publisher
 
     def fk_callback(self, msg):
         
@@ -28,8 +34,10 @@ class ForwardKinematicsOMX(Node):
         p_x = math.cos(q1)*(133.4*math.cos(phi) + 148*math.cos(q2 + q3) + 128*math.sin(q2))
         p_y = math.sin(q1)*(133.4*math.cos(phi) + 148*math.cos(q2 + q3) + 128*math.sin(q2))
         p_z = 128*math.cos(q2) - 148*math.sin(q2 + q3) - 133.4*math.sin(phi) + 96.3264
+        p = [p_x, p_y, p_z]
+        self.publisher.publish(p)
         
-        self.get_logger().info('End-effector pose is: %f, %f, %f' % (p_x, p_y, p_z))
+        # self.get_logger().info('End-effector pose is: %f, %f, %f' % (p_x, p_y, p_z))
 
 
 def main(args=None):
