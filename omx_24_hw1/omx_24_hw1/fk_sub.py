@@ -7,6 +7,7 @@ import math
 class ForwardKinematicsOMX(Node):
 
     def __init__(self):
+        super().__init__('forward_kinematics_omx')
         self.subscription = self.create_subscription(
             JointState,
             'joint_states',
@@ -24,24 +25,24 @@ class ForwardKinematicsOMX(Node):
 
         phi = q2 + q3 + q4
 
-        p_x = math.cos(q1)(133.4*math.cos(phi) + 148*math.cos(q2 + q3) + 128*math.sin(q2))
-        p_y = math.sin(q1)(133.4*math.cos(phi) + 148*math.cos(q2 + q3) + 128*math.sin(q2))
+        p_x = math.cos(q1)*(133.4*math.cos(phi) + 148*math.cos(q2 + q3) + 128*math.sin(q2))
+        p_y = math.sin(q1)*(133.4*math.cos(phi) + 148*math.cos(q2 + q3) + 128*math.sin(q2))
         p_z = 128*math.cos(q2) - 148*math.sin(q2 + q3) - 133.4*math.sin(phi) + 96.3264
         
-        self.get_logger().info('End-effector pose is: "%f, %f, %f"' % p_x, p_y, p_z)
+        self.get_logger().info('End-effector pose is: %f, %f, %f' % (p_x, p_y, p_z))
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    fk_sub = ForwardKinematicsOMX()
+    forward_kinematics_omx = ForwardKinematicsOMX()
 
-    rclpy.spin(fk_sub)
+    rclpy.spin(forward_kinematics_omx)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    fk_sub.destroy_node()
+    forward_kinematics_omx.destroy_node()
     rclpy.shutdown()
 
 
