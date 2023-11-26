@@ -1,0 +1,3 @@
+[console_scripts]
+fk_sub = omx_24_hw1.fk_sub:main
+

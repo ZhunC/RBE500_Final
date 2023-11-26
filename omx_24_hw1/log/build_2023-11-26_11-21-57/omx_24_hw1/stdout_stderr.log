@@ -1,0 +1,37 @@
+running egg_info
+creating build/omx_24_hw1/omx_24_hw1.egg-info
+writing build/omx_24_hw1/omx_24_hw1.egg-info/PKG-INFO
+writing dependency_links to build/omx_24_hw1/omx_24_hw1.egg-info/dependency_links.txt
+writing entry points to build/omx_24_hw1/omx_24_hw1.egg-info/entry_points.txt
+writing requirements to build/omx_24_hw1/omx_24_hw1.egg-info/requires.txt
+writing top-level names to build/omx_24_hw1/omx_24_hw1.egg-info/top_level.txt
+writing manifest file 'build/omx_24_hw1/omx_24_hw1.egg-info/SOURCES.txt'
+reading manifest file 'build/omx_24_hw1/omx_24_hw1.egg-info/SOURCES.txt'
+writing manifest file 'build/omx_24_hw1/omx_24_hw1.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/build
+creating /home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/build/lib
+creating /home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/build/lib/omx_24_hw1
+copying omx_24_hw1/__init__.py -> /home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/build/lib/omx_24_hw1
+copying omx_24_hw1/fk_sub.py -> /home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/build/lib/omx_24_hw1
+running install
+/usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+  warnings.warn(
+running install_lib
+creating /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/lib/python3.10/site-packages/omx_24_hw1
+copying /home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/build/lib/omx_24_hw1/__init__.py -> /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/lib/python3.10/site-packages/omx_24_hw1
+copying /home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/build/lib/omx_24_hw1/fk_sub.py -> /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/lib/python3.10/site-packages/omx_24_hw1
+byte-compiling /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/lib/python3.10/site-packages/omx_24_hw1/__init__.py to __init__.cpython-310.pyc
+byte-compiling /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/lib/python3.10/site-packages/omx_24_hw1/fk_sub.py to fk_sub.cpython-310.pyc
+running install_data
+creating /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/share/ament_index
+creating /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/share/ament_index/resource_index
+creating /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/share/ament_index/resource_index/packages
+copying resource/omx_24_hw1 -> /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/share/ament_index/resource_index/packages
+copying package.xml -> /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/share/omx_24_hw1
+running install_egg_info
+Copying build/omx_24_hw1/omx_24_hw1.egg-info to /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/lib/python3.10/site-packages/omx_24_hw1-0.0.0-py3.10.egg-info
+running install_scripts
+Installing fk_sub script to /home/redlightning/rbe500-ros/src/omx_24_hw1/install/omx_24_hw1/lib/omx_24_hw1
+writing list of installed files to '/home/redlightning/rbe500-ros/src/omx_24_hw1/build/omx_24_hw1/install.log'
