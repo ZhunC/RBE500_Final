@@ -1,0 +1,16 @@
+package.xml
+setup.cfg
+setup.py
+build/omx_24_hw1/omx_24_hw1.egg-info/PKG-INFO
+build/omx_24_hw1/omx_24_hw1.egg-info/SOURCES.txt
+build/omx_24_hw1/omx_24_hw1.egg-info/dependency_links.txt
+build/omx_24_hw1/omx_24_hw1.egg-info/entry_points.txt
+build/omx_24_hw1/omx_24_hw1.egg-info/requires.txt
+build/omx_24_hw1/omx_24_hw1.egg-info/top_level.txt
+build/omx_24_hw1/omx_24_hw1.egg-info/zip-safe
+omx_24_hw1/__init__.py
+omx_24_hw1/fk_sub.py
+resource/omx_24_hw1
+test/test_copyright.py
+test/test_flake8.py
+test/test_pep257.py
