@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from open_manipulator_msgs.srv import SetJointPosition
+from open_manipulator_msgs.srv import IK_srv
 import sys
 import numpy as np
 from scipy.optimal import fsolve
@@ -8,25 +8,26 @@ from scipy.optimal import fsolve
 
 class IK_service(Node):
     def __init__(self):
-        super().__init__('IK_service')
-        self.client = self.create_client(SetJointPosition, 'goal_joint_space_path')
-        while not self.client.wait_for_service(timeout_sec=1.0):
-            if not rclpy.ok():
-                self.get_logger().error('Interrupted while waiting for the service. Exiting.')
-                sys.exit(0)
-            self.get_logger().info('Service not available, waiting again...')
-        self.send_request()
+        super().__init__('IK_srv')
+        self.srv = self.create_service(IK_srv, 'IK_service', self.IK_callback)
 
-    def send_request(self):
-        request = SetJointPosition.Request()
-        request.planning_group = ''
-        request.joint_position.joint_name = ['joint1', 'joint2', 'joint3', 'joint4', 'gripper']
-        request.joint_position.position = [0.0, 0.0, 0.0, 0.0, 0.0]
-        request.path_time = 5.0
-
-        self.future = self.client.call_async(request)
+    def IK_callback(self, request, response):
+        self.get_logger().info('Incoming request received.')
+        H05 = self.array_to_matrix(request.Transformation_Matrix)
+        joint_states = self.Inverse_Kinematics(H05)
+        self.get_logger().info('Finished calculating joint states.')
+        response.Joint_States = joint_states
+        return response
     
-     
+    def array_to_matrix(array):
+        # converts a 16-element array to a 4-by-4 matrix
+        matrix = [[],[],[],[]]
+        for i in range(0, 15):
+            fraction = int(i / 4) # this is the row number
+            remainder = i % 4 # this is the column number
+            matrix[fraction].append(array[i])
+        return matrix
+
     def Inverse_Kinematics(self, H05):
         # This is the core functionality of the ik server.
         # It takes in the desired homogenous transformation matrix H05, which is a list [[e00, e01, e02, e03],[...],[...],[...]]
@@ -49,22 +50,13 @@ class IK_service(Node):
 
 
 
+def main():
+    rclpy.init()
 
-def main(args=None):
-    rclpy.init(args=args)
+    minimal_service = MinimalService()
 
-    basic_robot_control = BasicRobotControl()
+    rclpy.spin(minimal_service)
 
-    while rclpy.ok():
-        rclpy.spin_once(basic_robot_control)
-        if basic_robot_control.future.done():
-            try:
-                response = basic_robot_control.future.result()
-            except Exception as e:
-                basic_robot_control.get_logger().error('Service call failed %r' % (e,))
-            break
-
-    basic_robot_control.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':
