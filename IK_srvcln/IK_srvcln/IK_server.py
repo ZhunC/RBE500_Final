@@ -4,6 +4,7 @@ from open_manipulator_msgs.srv import IK_srv
 import sys
 import numpy as np
 from scipy.optimal import fsolve
+from std_msgs import float32MultiArray
 
 
 class IK_service(Node):
