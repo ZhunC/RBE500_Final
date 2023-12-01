@@ -36,6 +36,9 @@ set(srv_files
   "srv/SetKinematicsPose.srv"
   "srv/SetDrawingTrajectory.srv"
   "srv/SetActuatorState.srv"
+  "srv/IKsrv.srv"
+  "srv/J2Esrv.srv"
+  "srv/E2Jsrv.srv"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
