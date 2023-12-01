@@ -19,7 +19,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'service = IK_srvcln.IK_server:main'
+        	'service = IK_srvcln.IK_server:main'
         ],
     },
 )
