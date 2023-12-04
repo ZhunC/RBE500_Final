@@ -72,14 +72,30 @@ class velkin_service(Node):
         # response.q4 = self.q4*180.0/np.pi
         return response
     
-    def Jacobian():
+    def Jacobian(self):
         """
         Given self, which has all values as its attributes
         Find the 6-by-5 Jacobian matrix in the data form of np.matrix 
         """
-        # TBD
+        # linear parts
+        linear1 = np.matrix([0,0,0]).T
+        linear2 = np.cross([0,0,1], (self.H05[1:3,4]-self.H01[1:3,4])).T
+        linear3 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[1:3,4]-self.H02[1:3,4])).T
+        linear4 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[1:3,4]-self.H03[1:3,4])).T
+        linear5 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[1:3,4]-self.H04[1:3,4])).T
+        linear = np.concatenate([linear1, linear2, linear3, linear4, linear5], axis=1)
 
-        return None
+        angular1 = np.matrix([0, 0, 0]).T
+        angular2 = np.matrix([0, 0, 1]).T
+        angular3 = np.matrix([-np.sin(self.q1),np.cos(self.q1),0]).T
+        angular4 = np.matrix([-np.sin(self.q1),np.cos(self.q1),0]).T
+        angular5 = np.matrix([-np.sin(self.q1),np.cos(self.q1),0]).T
+        angular = np.concatenate([angular1, angular2, angular3, angular4, angular5], axis=1)
+
+        J = np.concatenate([linear, angular], axis = 0)
+        
+
+        return J
     
     def DH(a, alpha, d, theta):
         """
@@ -94,7 +110,55 @@ class velkin_service(Node):
         return result
 
     def J2E_callback(self, request, response):
-        return None
+        self.get_logger().info('Incoming request for conversion to ee velocities received.')
+
+        # extracting from request
+        qd = np.matrix([request.q1d, request.q2d, request.q3d, request.q4d]).T
+        q = [request.q1, request.q2, request.q3, request.q4] 
+
+        # individual transformation matrices
+        # data type is np.matrix to allow direct matrix multiplication with operator '*'
+        self.H01 = self.DH(0, 0, 36.076, 0)
+        self.H12 = self.DH(0, -np.pi/2, 60.25, self.q1) 
+        self.H23 = self.DH(128, 0, 0, self.q2-np.pi/2) 
+        self.H34 = self.DH(148, 0, 0, self.q3+np.pi/2) 
+        self.H45 = self.DH(133.4, 0, 0, self.q4) 
+
+        # individual joint matrices
+        self.H02 = self.H01*self.H12
+        self.H03 = self.H02*self.H23
+        self.H04 = self.H03*self.H34
+        self.H05 = self.forward_kin(request.q1, request.q2, request.q3, request.q4)
+        
+        # form jacobian 
+        self.J = self.Jacobian()
+
+        # compute joint velocities  
+        ee_vel = self.J*qd
+
+        # assign into responses
+        response.vx = ee_vel[0]
+        response.vy = ee_vel[1]
+        response.vz = ee_vel[2]
+        response.wx = ee_vel[3]
+        response.wy = ee_vel[4]
+        response.wz = ee_vel[3]
+
+
+        # for i in range(0,3):
+        #     for j in range(0,3):
+        #         transformation_matrix[i][j] = transformation_array[4*i + j]
+        # H05 = self.array_to_matrix(transformation_array)
+        # self.H05 = self.transformation_matrix # edit: commented this out and changed to the following line
+        # print(self.H05[1][1])
+        
+        # joint_states = self.Inverse_Kinematics()
+        # self.get_logger().info('Finished calculating joint states.')
+        # response.q1 = self.q1*180.0/np.pi
+        # response.q2 = (self.q2 + np.pi/2)*180.0/np.pi
+        # response.q3 = (self.q3 - np.pi/2)*180.0/np.pi
+        # response.q4 = self.q4*180.0/np.pi
+        return response
     
 
     
