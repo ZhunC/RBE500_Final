@@ -20,6 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+        	'service = omx_24_vel_kin.velkin:main',
+        	'qinc = omx_24_vel_kin.q_inc:main',
+        	'client = omx_24_vel_kin.move_incremental:main'
         ],
     },
 )

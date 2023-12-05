@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from open_manipulator_msgs.srv import E2Jsrv, J2Esrv
+from sensor_msgs.msg import JointState
 import numpy as np
 from numpy.linalg import pinv
 from scipy.optimize import fsolve
@@ -9,6 +10,7 @@ from scipy.optimize import fsolve
 class velkin_service(Node):
     def __init__(self):
         super().__init__('velkin_srv')
+        self.subscription = self.create_subscription(JointState, 'joint_states', self.joint_callback,10)
         self.E2Jsrv = self.create_service(E2Jsrv, 'E2J_service', self.E2J_callback)
         """ 
         E2J request is in form of: vx, vy, vz, q1, q2, q3, q4
@@ -21,28 +23,34 @@ class velkin_service(Node):
         remember to update the service types
         """
         # self.subscription = self.create_subscription(JointState,'joint_states', self.jointstate_callback,10)
-        # self.subscription
+        self.subscription
+
+    def joint_callback(self, msg):
+        self.q1 = msg.position[0]
+        self.q2 = msg.position[1]
+        self.q3 = msg.position[2]
+        self.q4 = msg.position[3]
+        print(self.q2)
 
     def E2J_callback(self, request, response):
         self.get_logger().info('Incoming request for conversion to joint velocities received.')
 
         # extracting from request
-        ee_vel = np.matrix([0, 0, 0, request.vx, request.vy, request.vz]).T
-        q = [request.q1, request.q2, request.q3, request.q4] 
-
+        ee_vel = np.matrix([request.vx, request.vy, request.vz, request.wx, request.wy, request.wz]).T
         # individual transformation matrices
         # data type is np.matrix to allow direct matrix multiplication with operator '*'
         self.H01 = self.DH(0, 0, 36.076, 0)
         self.H12 = self.DH(0, -np.pi/2, 60.25, self.q1) 
-        self.H23 = self.DH(128, 0, 0, self.q2-np.pi/2) 
-        self.H34 = self.DH(148, 0, 0, self.q3+np.pi/2) 
+        self.H23 = self.DH(128, 0, 0, self.q2 - np.pi/2) 
+        self.H34 = self.DH(148, 0, 0, self.q3 + np.pi/2) 
         self.H45 = self.DH(133.4, 0, 0, self.q4) 
 
         # individual joint matrices
         self.H02 = self.H01*self.H12
         self.H03 = self.H02*self.H23
         self.H04 = self.H03*self.H34
-        self.H05 = self.forward_kin(request.q1, request.q2, request.q3, request.q4)
+        self.H05 = self.forward_kin(self.q1, self.q2, self.q3, self.q4)
+        print('H04 is ', self.H04)
         
         # form jacobian 
         self.J = self.Jacobian()
@@ -50,11 +58,13 @@ class velkin_service(Node):
         # compute joint velocities  
         joint_vel = pinv(self.J)*ee_vel
 
+        print('Jacobian is ',pinv(self.J))
+
         # assign into responses
-        response.q1d = joint_vel[0]
-        response.q2d = joint_vel[1]
-        response.q3d = joint_vel[2]
-        response.q4d = joint_vel[3]
+        response.q1d = float(joint_vel[1])
+        response.q2d = float(joint_vel[2])
+        response.q3d = float(joint_vel[3])
+        response.q4d = float(joint_vel[4])
 
 
         # for i in range(0,3):
@@ -70,6 +80,7 @@ class velkin_service(Node):
         # response.q2 = (self.q2 + np.pi/2)*180.0/np.pi
         # response.q3 = (self.q3 - np.pi/2)*180.0/np.pi
         # response.q4 = self.q4*180.0/np.pi
+        print('response is',response)
         return response
     
     def Jacobian(self):
@@ -79,10 +90,10 @@ class velkin_service(Node):
         """
         # linear parts
         linear1 = np.matrix([0,0,0]).T
-        linear2 = np.cross([0,0,1], (self.H05[1:3,4]-self.H01[1:3,4])).T
-        linear3 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[1:3,4]-self.H02[1:3,4])).T
-        linear4 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[1:3,4]-self.H03[1:3,4])).T
-        linear5 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[1:3,4]-self.H04[1:3,4])).T
+        linear2 = np.cross([0,0,1], (self.H05[0:2,3]-self.H01[0:2,3]).T).T
+        linear3 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[0:2,3]-self.H02[0:2,3]).T).T
+        linear4 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[0:2,3]-self.H03[0:2,3]).T).T
+        linear5 = np.cross([-np.sin(self.q1),np.cos(self.q1),0], (self.H05[0:2,3]-self.H04[0:2,3]).T).T
         linear = np.concatenate([linear1, linear2, linear3, linear4, linear5], axis=1)
 
         angular1 = np.matrix([0, 0, 0]).T
@@ -93,11 +104,11 @@ class velkin_service(Node):
         angular = np.concatenate([angular1, angular2, angular3, angular4, angular5], axis=1)
 
         J = np.concatenate([linear, angular], axis = 0)
-        
+        print(J)
 
         return J
     
-    def DH(a, alpha, d, theta):
+    def DH(self, a, alpha, d, theta):
         """
         The Python version of Chris' DH.m
         Given the four DH parameters
@@ -113,37 +124,38 @@ class velkin_service(Node):
         self.get_logger().info('Incoming request for conversion to ee velocities received.')
 
         # extracting from request
-        qd = np.matrix([request.q1d, request.q2d, request.q3d, request.q4d]).T
-        q = [request.q1, request.q2, request.q3, request.q4] 
+        qd = np.matrix([0, request.q1d, request.q2d, request.q3d, request.q4d]).T
 
-        # individual transformation matrices
+         # individual transformation matrices
         # data type is np.matrix to allow direct matrix multiplication with operator '*'
         self.H01 = self.DH(0, 0, 36.076, 0)
         self.H12 = self.DH(0, -np.pi/2, 60.25, self.q1) 
-        self.H23 = self.DH(128, 0, 0, self.q2-np.pi/2) 
-        self.H34 = self.DH(148, 0, 0, self.q3+np.pi/2) 
+        self.H23 = self.DH(128, 0, 0, self.q2 - np.pi/2) 
+        self.H34 = self.DH(148, 0, 0, self.q3 + np.pi/2) 
         self.H45 = self.DH(133.4, 0, 0, self.q4) 
 
         # individual joint matrices
         self.H02 = self.H01*self.H12
         self.H03 = self.H02*self.H23
         self.H04 = self.H03*self.H34
-        self.H05 = self.forward_kin(request.q1, request.q2, request.q3, request.q4)
+        self.H05 = self.forward_kin(self.q1, self.q2, self.q3, self.q4)
+        print('H04 = ',self.H04)
         
         # form jacobian 
         self.J = self.Jacobian()
+
 
         # compute joint velocities  
         ee_vel = self.J*qd
 
         # assign into responses
-        response.vx = ee_vel[0]
-        response.vy = ee_vel[1]
-        response.vz = ee_vel[2]
-        response.wx = ee_vel[3]
-        response.wy = ee_vel[4]
-        response.wz = ee_vel[3]
-
+        response.vx = float(ee_vel[0])
+        response.vy = float(ee_vel[1])
+        response.vz = float(ee_vel[2])
+        response.wx = float(ee_vel[3])
+        response.wy = float(ee_vel[4])
+        response.wz = float(ee_vel[5])
+        print('response is ', response)
 
         # for i in range(0,3):
         #     for j in range(0,3):
@@ -236,12 +248,7 @@ class velkin_service(Node):
     #     # auxillary function needed to run scipy.optimal.fsolve
     #     y1 = (np.cos(t1)*(667*np.cos(t234) + 740*np.cos(x[1] + x[2]) + 640*np.cos(x[1])))/5 - x_desired
     #     y2 = 48163/500 - 148*np.sin(x[1] + x[2]) - 128*np.sin(x[1]) - (667*np.sin(t234))/5 - z_desired
-    #     return [y1, y2]
-
-
-                                                                
-
-
+    #     return [y1, y2
 
 def main():
     rclpy.init()

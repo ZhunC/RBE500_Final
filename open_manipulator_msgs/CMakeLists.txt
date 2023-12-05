@@ -39,6 +39,7 @@ set(srv_files
   "srv/IKsrv.srv"
   "srv/J2Esrv.srv"
   "srv/E2Jsrv.srv"
+  "srv/Qincsrv.srv"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
