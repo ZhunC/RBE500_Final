@@ -1,14 +1,14 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-from open_manipulator_msgs.srv import SetJointPosition, E2Jsrv, Qinc
-import sys
+from open_manipulator_msgs.srv import SetJointPosition, E2Jsrv, Qincsrv
+import sys, time
 
 class MoveInStraightLine(Node):
     def __init__(self):
         super().__init__('move_robot_on_y_axis')
         
-        self.subscription = self.create_subscription(JointState, 'joint_states', self.joints_callback,10)
+        self.subscription = self.create_subscription(JointState, 'joint_states', self.joint_callback,10)
 
         self.client_e2j = self.create_client(E2Jsrv, 'E2J_service')
         while not self.client_e2j.wait_for_service(timeout_sec=1.0):
@@ -16,9 +16,9 @@ class MoveInStraightLine(Node):
                 self.get_logger().error('Interrupted while waiting for the service. Exiting.')
                 sys.exit(0)
             self.get_logger().info('E2J service not available, waiting again...')
-        # self.send_request_e2j()
+        #self.send_request_e2j()
 
-        self.client_incremental = self.create_client(Qinc, 'q_inc_service')
+        self.client_incremental = self.create_client(Qincsrv, 'q_inc_service')
         while not self.client_incremental.wait_for_service(timeout_sec=1.0):
             if not rclpy.ok():
                 self.get_logger().error('Interrupted while waiting for the service. Exiting.')
@@ -27,7 +27,7 @@ class MoveInStraightLine(Node):
         # self.send_request_qinc()       
         
         self.client_setposition = self.create_client(SetJointPosition, 'goal_joint_space_path')
-        while not self.client.wait_for_service(timeout_sec=1.0):
+        while not self.client_setposition.wait_for_service(timeout_sec=1.0):
             if not rclpy.ok():
                 self.get_logger().error('Interrupted while waiting for the service. Exiting.')
                 sys.exit(0)
@@ -41,24 +41,32 @@ class MoveInStraightLine(Node):
         self.q2 = msg.position[1]
         self.q3 = msg.position[2]
         self.q4 = msg.position[3]
+        #self.get_logger().info('Move %f', %(self.q1))
 
     def send_request_e2j(self, vx, vy, vz, wx, wy, wz):
         request = E2Jsrv.Request()
+        print('type of response of e2j is ', type(request))
         request.vx = vx
         request.vy = vy
         request.vz = vz
         request.wx = wx
         request.wy = wy
         request.wz = wz
+        #self.joint_callback()
+        print(self.q1)
         request.q1 = self.q1
         request.q2 = self.q2
         request.q3 = self.q3
         request.q4 = self.q4
         self.joint_vel = self.client_e2j.call_async(request)
+        while not self.joint_vel.done():
+            time.sleep(0.5)
+            print('Waiting for E2J')
+        return self.joint_vel.result()
         
 
     def send_request_qinc(self, q1d, q2d, q3d, q4d):
-        request = Qinc.Request()
+        request = Qincsrv.Request()
         request.q1d = q1d
         request.q1d = q2d
         request.q1d = q3d
@@ -69,6 +77,10 @@ class MoveInStraightLine(Node):
         request.q4 = self.q4
 
         self.new_joints = self.client.call_async(request)
+        while not self.new_joints.done():
+            time.sleep(0.5)
+            print('Waiting for qinc')
+        return self.new_joints.result()
         
 
     def send_request_move(self, q1new, q2new, q3new, q4new):
@@ -86,21 +98,26 @@ def main(args=None):
     move_robot_on_y_axis = MoveInStraightLine()
     i = 0
     while rclpy.ok() and (i<100):
-        #rclpy.spin_once(move_robot_on_y_axis)
-        
+        #rclpy.spin_until_future_complete(move_robot_on_y_axis)
+        rclpy.spin_once(move_robot_on_y_axis)
         # get joint values at the current iteration
-        move_robot_on_y_axis.joint_callback()
+        move_robot_on_y_axis.joint_callback
+        print(move_robot_on_y_axis.q1)
 
         # desired e.e. velocities
-        vx = 0; vy = 1; vz = 0; wx = 0; wy = 0; wz = 0
+        vx = 0.0; vy = 1.0; vz = 0.0; wx = 0.0; wy = 0.0; wz = 0.0
 
+        #if move_robot_on_y_axis.future.done():
         # calculate joint velocities
-        move_robot_on_y_axis.send_request_e2j(vx, vy, vz, wx, wy, wz)
-        response = move_robot_on_y_axis.joint_vel.result()
+        response = move_robot_on_y_axis.send_request_e2j(vx, vy, vz, wx, wy, wz)
+        
+        # response = move_robot_on_y_axis.joint_vel.result()
+
+        print(response)
 
         # calculate joint positions for the next time instance
-        move_robot_on_y_axis.send_request_qinc(response.q1d, response.q2d, response.q3d, response.q4d)
-        response = move_robot_on_y_axis.new_joints.result()
+        response = move_robot_on_y_axis.send_request_qinc(response.q1d, response.q2d, response.q3d, response.q4d)
+        # response = move_robot_on_y_axis.new_joints.result()
 
         # send the new joint positions to the robot
         move_robot_on_y_axis.send_request_move(response.q1new, response.q2new, response.q3new, response.q4new)
