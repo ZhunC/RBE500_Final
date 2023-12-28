@@ -1,9 +1,9 @@
 
-#RBE 500 - Foundations of Robotics 2023 
+# RBE 500 - Foundations of Robotics 2023 
 ---
-##Taught by Professor Berk Calli at Worcester Polytechnic Institute Robotics Engineering Department
+## Taught by Professor Berk Calli at Worcester Polytechnic Institute Robotics Engineering Department
 
-##Team 24 Members: Zhun Cheng, Niranjan Kumar Ilampooranan, Chris Nguyen
+## Team 24 Members: Zhun Cheng, Niranjan Kumar Ilampooranan, Chris Nguyen
 ---
 
 # OpenManipulatorX_ROS2
