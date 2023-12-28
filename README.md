@@ -1,6 +1,9 @@
-RBE 500 - Foundations of Robotics 2023 taught by Professor Berk Calli at Worcester Polytechnic Institute Robotics Engineering Department
-Team 24 Members: Zhun Cheng, Niranjan Kumar Ilampooranan, Chris Nguyen
 
+#RBE 500 - Foundations of Robotics 2023 
+---
+##Taught by Professor Berk Calli at Worcester Polytechnic Institute Robotics Engineering Department
+
+##Team 24 Members: Zhun Cheng, Niranjan Kumar Ilampooranan, Chris Nguyen
 ---
 
 # OpenManipulatorX_ROS2
@@ -48,5 +51,5 @@ ros2 run omx_24_vel_kin qinc - To launch the service used to obtain incremental 
 ros2 run omx_24_vel_kin client - To make the robot arm trace a straight line using previous services and subscribers
 
 ros2 run omx_24_pd_ctr client - To run the required services for controlling the robot arm to reach desired position based on PD current-based position controller written for Dynamixel actuators
----
+
 
