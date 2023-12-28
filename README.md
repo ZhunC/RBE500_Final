@@ -42,13 +42,26 @@ ros2 run rbe500_example_py basic_robot_control
 omx_24_hw1, omx_24_vel_kin, and omx_24_pd_ctr are the separate packages written for respective modules
 
 To run the packages, the computer needs to be connected to the OpenManipulatorX. The necessary commands are - 
+```
+ros2 run omx_24_hw1 fk_sub
+```
+To obtain the current pose of the arm for current joint angles and publish them
+```
+ros2 run omx_24_vel_kin service
+```
+To launch the service for conversion between task-space velocities and joint-space velocities
+```
+ros2 run omx_24_vel_kin qinc
+```
+To launch the service used to obtain incremental joint angles based on current velocity (which will be used to set as intermediate joint-space goals)
+```
+ros2 run omx_24_vel_kin client
+```
+To make the robot arm trace a straight line using previous services and subscribers
 
-ros2 run omx_24_hw1 fk_sub - To obtain the current pose of the arm for current joint angles and publish them
-
-ros2 run omx_24_vel_kin service - To launch the service for conversion between task-space velocities and joint-space velocities
-ros2 run omx_24_vel_kin qinc - To launch the service used to obtain incremental joint angles based on current velocity (which will be used to set as intermediate joint-space goals)
-ros2 run omx_24_vel_kin client - To make the robot arm trace a straight line using previous services and subscribers
-
-ros2 run omx_24_pd_ctr client - To run the required services for controlling the robot arm to reach desired position based on PD current-based position controller written for Dynamixel actuators
+```
+ros2 run omx_24_pd_ctr client
+```
+To run the required services for controlling the robot arm to reach desired position based on PD current-based position controller written for Dynamixel actuators
 
 
