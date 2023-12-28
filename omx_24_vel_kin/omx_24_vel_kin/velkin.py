@@ -30,7 +30,6 @@ class velkin_service(Node):
         self.q2 = msg.position[1]
         self.q3 = msg.position[2]
         self.q4 = msg.position[3]
-        print(self.q2)
 
     def E2J_callback(self, request, response):
         self.get_logger().info('Incoming request for conversion to joint velocities received.')
@@ -50,7 +49,7 @@ class velkin_service(Node):
         self.H03 = self.H02*self.H23
         self.H04 = self.H03*self.H34
         self.H05 = self.forward_kin(self.q1, self.q2, self.q3, self.q4)
-        print('H04 is ', self.H04)
+        #print('H04 is ', self.H04)
         
         # form jacobian 
         self.J = self.Jacobian()
@@ -58,7 +57,7 @@ class velkin_service(Node):
         # compute joint velocities  
         joint_vel = pinv(self.J)*ee_vel
 
-        print('Jacobian is ',pinv(self.J))
+        #print('Jacobian is ',pinv(self.J))
 
         # assign into responses
         response.q1d = float(joint_vel[1])
@@ -104,7 +103,7 @@ class velkin_service(Node):
         angular = np.concatenate([angular1, angular2, angular3, angular4, angular5], axis=1)
 
         J = np.concatenate([linear, angular], axis = 0)
-        print(J)
+        #print(J)
 
         return J
     
@@ -139,7 +138,7 @@ class velkin_service(Node):
         self.H03 = self.H02*self.H23
         self.H04 = self.H03*self.H34
         self.H05 = self.forward_kin(self.q1, self.q2, self.q3, self.q4)
-        print('H04 = ',self.H04)
+        #print('H04 = ',self.H04)
         
         # form jacobian 
         self.J = self.Jacobian()

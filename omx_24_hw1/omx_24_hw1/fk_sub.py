@@ -50,7 +50,6 @@ class ForwardKinematicsOMX(Node):
         y = (r13 - r31)/(4*w)
         z = (r21 - r12)/(4*w)
 
-
         p = [p_x, p_y, p_z]
         # self.msg = /* msg_type */()
         # self.get_logger().info('Publishing message')
@@ -64,6 +63,7 @@ class ForwardKinematicsOMX(Node):
         msg.orientation.x = x
         msg.orientation.y = y
         msg.orientation.z = z
+        
         # pose.position = [p_x, p_y, p_z]
         # pose.orientation = [w, x, y, z]
 

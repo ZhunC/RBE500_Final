@@ -27,6 +27,7 @@ set(msg_files
   "msg/JointPosition.msg"
   "msg/KinematicsPose.msg"
   "msg/OpenManipulatorState.msg"
+  
 )
 
 set(srv_files

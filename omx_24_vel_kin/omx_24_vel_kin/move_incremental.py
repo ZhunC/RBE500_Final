@@ -51,9 +51,9 @@ class MoveInStraightLine(Node):
     def send_request_qinc(self, q1d, q2d, q3d, q4d):
         request = Qincsrv.Request()
         request.q1d = q1d
-        request.q1d = q2d
-        request.q1d = q3d
-        request.q1d = q4d
+        request.q2d = q2d
+        request.q3d = q3d
+        request.q4d = q4d
 
         self.new_joints = self.client_incremental.call_async(request)
         rclpy.spin_until_future_complete(self, self.new_joints)
@@ -69,10 +69,12 @@ class MoveInStraightLine(Node):
         request.planning_group = ''
         request.joint_position.joint_name = ['joint1', 'joint2', 'joint3', 'joint4', 'gripper']
         request.joint_position.position = [q1new, q2new, q3new, q4new, 0.0]
-        request.path_time = 5.0
-        # print(request)
+        request.path_time = 1.0
+        print(request)
         self.future = self.client_setposition.call_async(request)
-        rclpy.spin_until_future_complete(self, self.new_joints)
+        print(self.future.done)
+        # print(self.future)
+        # rclpy.spin_until_future_complete(self, self.new_joints)
 
 
 def main(args=None):
@@ -87,15 +89,19 @@ def main(args=None):
     while rclpy.ok():
         
         response_e2j = move_robot_on_y_axis.send_request_e2j(vx, vy, vz, wx, wy, wz)
+        print(response_e2j)
         response_qinc = move_robot_on_y_axis.send_request_qinc(response_e2j.q1d, response_e2j.q2d, response_e2j.q3d, response_e2j.q4d)
+        print(response_qinc)
         response_move = move_robot_on_y_axis.send_request_move(response_qinc.q1new, response_qinc.q2new, response_qinc.q3new, response_qinc.q4new)
-        
-        # if move_robot_on_y_axis.future.done():
+        print(response_move)
+        # if move_robot_on_y_axis.future.done:
         #     try:
         #         response_e2j = move_robot_on_y_axis.send_request_e2j(vx, vy, vz, wx, wy, wz)
+        #         print(response_e2j)
         #         response_qinc = move_robot_on_y_axis.send_request_qinc(response_e2j.q1d, response_e2j.q2d, response_e2j.q3d, response_e2j.q4d)
+        #         print(response_qinc)
         #         response_move = move_robot_on_y_axis.send_request_move(response_qinc.q1new, response_qinc.q2new, response_qinc.q3new, response_qinc.q4new)
-
+        #         print(response_move)
         #     except Exception as e:
         #         move_robot_on_y_axis.get_logger().error('Service call failed %r' % (e,))
         #     break

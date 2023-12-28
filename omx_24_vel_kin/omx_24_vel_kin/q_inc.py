@@ -24,7 +24,6 @@ class joint_incremental_service(Node):
         self.q2 = msg.position[1]
         self.q3 = msg.position[2]
         self.q4 = msg.position[3]
-        print(self.q2)
 
     def q_inc_callback(self, request, response):
         # given q_old and q_dot, returns q_new
@@ -36,11 +35,11 @@ class joint_incremental_service(Node):
         response.q2new = del_t*(request.q2d) + self.q2
         response.q3new = del_t*(request.q3d) + self.q3
         response.q4new = del_t*(request.q4d) + self.q4
-        print('new q4 is: ', response.q4new)
-        self.q1 = response.q1new
-        self.q2 = response.q2new
-        self.q3 = response.q3new
-        self.q4 = response.q4new
+        print('response is ', response)
+        # self.q1 = response.q1new
+        # self.q2 = response.q2new
+        # self.q3 = response.q3new
+        # self.q4 = response.q4new
         return response
 
                                                            
